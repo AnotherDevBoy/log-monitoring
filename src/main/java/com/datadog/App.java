@@ -1,5 +1,6 @@
 package com.datadog;
 
+import com.datadog.cli.CliArgumentsParser;
 import com.datadog.clock.Clock;
 import com.datadog.domain.EventListener;
 import com.datadog.domain.EventParser;
@@ -12,29 +13,22 @@ import com.opencsv.CSVReaderBuilder;
 import java.io.FileReader;
 import java.util.List;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-
 public class App {
   public static void main(String[] args) {
-    Options options = new Options();
-    options.addRequiredOption("l", "log", true, "The path to the log file");
+    var maybeArguments = CliArgumentsParser.parseArguments(args);
+
+    if (maybeArguments.isEmpty()) {
+      return;
+    }
 
     try {
-      CommandLineParser parser = new DefaultParser();
-      CommandLine cmd = parser.parse(options, args);
-
-      var filePath = cmd.getOptionValue("log");
-
-      FileReader filereader = new FileReader(filePath);
+      FileReader filereader = new FileReader(maybeArguments.get().getFilePath());
 
       EventRepository repository = new InMemoryEventRepository();
       StatisticsReporter statisticsReporter = new StatisticsReporter(repository);
 
-      List<EventListener> eventListeners = List.of(new EventWriter(repository), new Clock(List.of(statisticsReporter)));
+      List<EventListener> eventListeners =
+          List.of(new EventWriter(repository), new Clock(List.of(statisticsReporter)));
 
       CSVReader csvReader = new CSVReaderBuilder(filereader).withSkipLines(1).build();
 
@@ -46,8 +40,8 @@ public class App {
         }
       }
     } catch (Exception e) {
-      HelpFormatter formatter = new HelpFormatter();
-      formatter.printHelp("LogMonitor", options);
+      // TODO: Error handling
+      System.err.println("An error occurred");
     }
   }
 }
