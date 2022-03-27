@@ -81,15 +81,25 @@ There are a few paths we could take:
 
 In order to facilidate the decision, I have assumed that the `csv` file contains a fair representation of what the real-life events will be like for this application and wrote a few scripts to understand the impact of either of the options highlighted above.
 
-**Ignoring out of order events**
+#### Ignoring out of order events
 The `ignored.py` script iterates through the `csv` file, increasing the internal timestamp every time a higher value is observed and tracking the number of events that would be ignored.
 
 For this particular `csv` file, there are a total of `4831` events from which `2817` would be ignored following this approach. In other words, 58.3% of the events would be dropped if we follow this approach.
 
-**Delay the reporting of statistics/alerts by a *well defined* number of seconds**
-In order to determine the right number of seconds that we should delay the reporting of statistics and alerts to increase the overall accuracy, I have written another script (`delay.py`) that will ...
+#### Delay the reporting of statistics/alerts by a *well defined* number of seconds
+In order to determine the right number of seconds that we should delay the reporting of statistics and alerts to increase the overall accuracy, I have modified the `ignored.py` to take a delay argument the defines the number of seconds to wait for out-of-order entries to be included in the statistics/alerts.
 
-TBD
+The results show the following:
+
+| Delay | % Ignored Entries |
+| ----- | ----------------- |
+|     0 |             58.3% |
+|     1 |             10.4% |
+|     2 |              0.0% |
+
+Depending on how these statistics will be consumed, since they are produced in an interval of 10 seconds, one could argue between using a delay of 1-2 seconds to balance the accuracy of the statistics vs how quickly they are displayed.
+
+For alerts, since the threshold is 2 minutes, we could consider bumping even higher (5 to 10 seconds) to account for anomalies that aren't covered by the current data set.
 
 ## Proposal
 ### Option A
