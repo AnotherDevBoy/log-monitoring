@@ -102,8 +102,11 @@ Depending on how these statistics will be consumed, since they are produced in a
 For alerts, since the threshold is 2 minutes, we could consider bumping even higher (5 to 10 seconds) to account for anomalies that aren't covered by the current data set.
 
 ## Proposal
-### Option A
+
+The solution will be an event-driven application
+
+### Option A - In-memory storage
 TBD
 
-### Option B
+### Option B - InfluxDB storage
 TBD
