@@ -1,4 +1,7 @@
-package com.datadog;
+package com.datadog.statistics;
+
+import com.datadog.domain.EventRepository;
+import com.datadog.clock.TickListener;
 
 public class StatisticsReporter implements TickListener {
   private final EventRepository eventRepository;

@@ -1,4 +1,6 @@
-package com.datadog;
+package com.datadog.domain;
+
+import com.datadog.domain.Event;
 
 import java.util.List;
 

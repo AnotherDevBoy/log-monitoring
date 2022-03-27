@@ -1,4 +1,4 @@
-package com.datadog;
+package com.datadog.domain;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -1,4 +1,6 @@
-package com.datadog;
+package com.datadog.domain;
+
+import com.datadog.domain.Event;
 
 public class EventParser {
   public static Event parseEvent(String[] row) {

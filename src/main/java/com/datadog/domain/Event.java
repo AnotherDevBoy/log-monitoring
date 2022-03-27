@@ -1,4 +1,4 @@
-package com.datadog;
+package com.datadog.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
