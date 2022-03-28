@@ -6,7 +6,7 @@ import com.datadog.domain.EventRepository;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class EventWriter implements EventListener {
+public class EventIngester implements EventListener {
   private final EventRepository repository;
 
   @Override

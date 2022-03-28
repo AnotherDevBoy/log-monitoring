@@ -1,9 +1,10 @@
 package com.datadog.domain;
 
 import java.util.List;
+import java.util.Map;
 
 public interface EventRepository {
   void insertEvent(Event event);
 
-  List<Event> getEvents();
+  Map<Long, List<Event>> getEvents(long start, long end);
 }

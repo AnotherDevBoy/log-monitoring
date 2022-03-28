@@ -6,7 +6,7 @@ import com.datadog.domain.EventListener;
 import com.datadog.domain.EventParser;
 import com.datadog.domain.EventRepository;
 import com.datadog.domain.InMemoryEventRepository;
-import com.datadog.ingestion.EventWriter;
+import com.datadog.ingestion.EventIngester;
 import com.datadog.statistics.StatisticsReporter;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
@@ -25,10 +25,10 @@ public class App {
       FileReader filereader = new FileReader(maybeArguments.get().getFilePath());
 
       EventRepository repository = new InMemoryEventRepository();
-      StatisticsReporter statisticsReporter = new StatisticsReporter(repository);
+      StatisticsReporter statisticsReporter = new StatisticsReporter(repository, 2);
 
       List<EventListener> eventListeners =
-          List.of(new EventWriter(repository), new Clock(List.of(statisticsReporter)));
+          List.of(new EventIngester(repository), new Clock(List.of(statisticsReporter)));
 
       CSVReader csvReader = new CSVReaderBuilder(filereader).withSkipLines(1).build();
 
@@ -41,7 +41,7 @@ public class App {
       }
     } catch (Exception e) {
       // TODO: Error handling
-      System.err.println("An error occurred");
+      System.err.println(e);
     }
   }
 }
