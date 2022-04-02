@@ -25,10 +25,10 @@ public class AlertReporter implements TickListener {
 
     if (this.active && averageRps < ALERT_THRESHOLD) {
       this.active = false;
-      System.out.printf("[%d] Alert defused\n", timestamp);
+      System.out.printf("High traffic alert mitigated at %d - hits = %f\n", timestamp, averageRps);
     } else if (!this.active && averageRps >= ALERT_THRESHOLD) {
       this.active = true;
-      System.out.printf("[%d] Alert fired\n", timestamp);
+      System.out.printf("High traffic generated an alert - hits = %f, triggered at %d.\n", averageRps, timestamp);
     }
   }
 }
