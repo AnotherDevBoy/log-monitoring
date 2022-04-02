@@ -1,5 +1,6 @@
 package com.datadog;
 
+import com.datadog.alerting.AlertReporter;
 import com.datadog.cli.CliArgumentsParser;
 import com.datadog.clock.Clock;
 import com.datadog.domain.EventListener;
@@ -26,9 +27,11 @@ public class App {
 
       EventRepository repository = new InMemoryEventRepository();
       StatisticsReporter statisticsReporter = new StatisticsReporter(repository, 2);
+      AlertReporter alertReporter = new AlertReporter(repository, 2);
 
       List<EventListener> eventListeners =
-          List.of(new EventIngester(repository), new Clock(List.of(statisticsReporter)));
+          List.of(
+              new EventIngester(repository), new Clock(List.of(statisticsReporter, alertReporter)));
 
       CSVReader csvReader = new CSVReaderBuilder(filereader).withSkipLines(1).build();
 
