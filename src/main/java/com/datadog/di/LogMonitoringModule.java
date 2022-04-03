@@ -29,7 +29,7 @@ public class LogMonitoringModule extends AbstractModule {
   @Singleton
   @Provides
   public EventRepository eventRepositoryProvider() {
-    // return new InMemoryEventRepository();
+    // return new InMemoryEventRepository(new StatusCodeAggregator());
     var container = new InfluxDBContainer<>(DockerImageName.parse("influxdb").withTag("1.8.10"));
     container.setEnv(List.of("INFLUXDB_RETENTION_ENABLED=false"));
 

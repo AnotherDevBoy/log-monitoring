@@ -1,14 +1,17 @@
 package com.datadog.domain;
 
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
 
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+@Slf4j
 @RequiredArgsConstructor
 public class InfluxDbEventRepository implements EventRepository {
   public static final String DATABASE_NAME = "monitoring";
@@ -63,6 +66,24 @@ public class InfluxDbEventRepository implements EventRepository {
 
   @Override
   public Map<Integer, Integer> getStatusCodesCount(long start, long end) {
-    return Map.of(200, 0);
+    StatusCodeAggregator statusCodeAggregator = new StatusCodeAggregator();
+
+    try {
+      Query query =
+          new Query(
+              String.format(
+                  "SELECT * from \"%s\" where time >= %ds and time < %ds GROUP BY \"status_code\"",
+                  METRIC_NAME, start, end));
+      var queryResult = influxDB.query(query);
+
+      for (var s : queryResult.getResults().get(0).getSeries()) {
+        statusCodeAggregator.addStatusCode(
+            Integer.parseInt(s.getTags().get("status_code")), s.getValues().size());
+      }
+    } catch (Exception e) {
+      log.warn("Unexpected response from InfluxDB", e);
+    }
+
+    return statusCodeAggregator.getStatusCodes();
   }
 }
