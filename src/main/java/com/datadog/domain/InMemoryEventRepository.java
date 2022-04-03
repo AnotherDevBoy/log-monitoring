@@ -25,9 +25,10 @@ public class InMemoryEventRepository implements EventRepository {
   public double getAverageRps(long start, long end) {
     var events = this.getEventsInRange(start, end);
 
-    double totalEvents = events.values().stream().mapToInt(List::size).reduce(0, Integer::sum);
-    double timeStamps = events.keySet().size();
-    return totalEvents / timeStamps;
+    double totalEvents = events.values().stream().mapToLong(List::size).reduce(0, Long::sum);
+
+    long interval = end - start;
+    return totalEvents / interval;
   }
 
   @Override
