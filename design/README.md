@@ -3,4 +3,4 @@ In this document you will find more information about how the application was de
 
 The following [C4 Container diagram](https://c4model.com/) shows a high level picture of the core components of the application.
 
-![Container](container.png "C4 Container diagram")
+<img src="container.png" alt="C4 Container diagram" width="300"/>
