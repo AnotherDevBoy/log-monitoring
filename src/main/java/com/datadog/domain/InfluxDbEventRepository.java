@@ -1,34 +1,20 @@
 package com.datadog.domain;
 
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
-import org.testcontainers.containers.InfluxDBContainer;
 
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
+@RequiredArgsConstructor
 public class InfluxDbEventRepository implements EventRepository {
-  private static final String DATABASE_NAME = "monitoring";
+  public static final String DATABASE_NAME = "monitoring";
   private static final String METRIC_NAME = "http-requests";
 
-  private InfluxDB influxDB;
-
-  public InfluxDbEventRepository(InfluxDBContainer container) {
-    this.influxDB =
-        container
-            .withUsername("admin")
-            .withPassword("password")
-            .withDatabase(DATABASE_NAME)
-            .getNewInfluxDB();
-
-    System.out.println("Creating database");
-    this.influxDB.query(new Query(String.format("CREATE DATABASE %s", DATABASE_NAME)));
-
-    Runtime.getRuntime().addShutdownHook(new Thread(influxDB::close));
-  }
+  private final InfluxDB influxDB;
 
   @SneakyThrows
   @Override

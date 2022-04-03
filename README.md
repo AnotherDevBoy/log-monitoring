@@ -1,5 +1,8 @@
 # log-monitoring
 
+## Setup steps
+// TODO: Instructions - Docker pull is required
+
 ## TODO
 
 - [ ] InfluxDB implementation

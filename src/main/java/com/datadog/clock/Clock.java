@@ -2,14 +2,13 @@ package com.datadog.clock;
 
 import com.datadog.domain.Event;
 import com.datadog.domain.EventListener;
-import java.util.List;
 
 public class Clock implements EventListener {
-  private final List<TickListener> listeners;
+  private final TickListener[] listeners;
 
   private long timestamp;
 
-  public Clock(List<TickListener> listeners) {
+  public Clock(TickListener... listeners) {
     this.listeners = listeners;
     timestamp = 0;
   }
