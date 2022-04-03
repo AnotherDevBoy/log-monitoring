@@ -39,13 +39,7 @@ java -jar log-monitoring.jar --log <path to csv file> --alert_threshold <new_thr
 ## TODO
 ### MUST
 - [ ] Explain how to improve design
+- [ ] Status code should start from 100 to be RFC compliant
 - [ ] Unit tests
 - [ ] Review all requirements are met
-- [ ] Status code should start from 100 to be RFC compliant
-
-### Optional
-- [ ] More statistics
-- [ ] More alert types
-- [ ] Test the code with a large number of events
-
 
