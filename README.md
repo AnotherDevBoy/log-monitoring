@@ -1,18 +1,37 @@
 # log-monitoring
 
-## Setup steps
+## Introduction
+Explain how to navigate this repo
+
+## How to run the app?
+### Setup steps
+Docker
+
+Maven
+
+Java
+
+### Build
+
+### Run
+
 // TODO: Instructions - Docker pull is required
 
-## TODO
-
-- [ ] InfluxDB implementation
+## Follow ups
+- SQS
 - [ ] InfluxDB batch writing
+
+## TODO
+MUST:
+- [x] InfluxDB implementation
+- [x] Queue to send events
 - [ ] Alert threshold should be configurable
-- [ ] Statistics threshold should be configurable
-- [ ] Queue to send events
-- [ ] More statistics
-- [ ] More alert types
-- [ ] Unit tests
-- [ ] Test the code with a large number of events
+- [ ] Status Code statistics
 - [ ] Instructions on how to run it
 - [ ] Explain how to improve design
+- [ ] Unit tests
+
+Optional:
+- [ ] More statistics
+- [ ] More alert types
+- [ ] Test the code with a large number of events
