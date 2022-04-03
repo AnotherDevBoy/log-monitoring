@@ -1,0 +1,34 @@
+@startuml 
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/release/1-0/C4_Container.puml
+
+' Fixes wrapping of some of the captions
+skinparam maxMessageSize 160
+
+System_Boundary(aws, "OS") {
+  System_Ext(csv, "CSV file", "A CSV file containing logs from a HTTP server")
+}
+
+System_Boundary(log_monitoring, "log-monitoring") {
+  Container(log_file_processor, "LogFileProcessor", "Java", "Reads the file and notifies EventListeners")
+  
+  Rel(csv, log_file_processor, "Reads from")
+  
+  Container(event_producer, "EventProducer", "Java", "Listens to new Events and notifies the EventConsumer")
+  Container(event_consumer, "EventConsumer", "Java", "Listens to notifications from the EventProducer and persists the HTTP events in the database")
+
+  ContainerDb(event_queue, "Event Queue", "In-memory", "Queue used to schedule the persistence of HTTP events")
+  ContainerDb(timeseries_db, "Events Database", "InfluxDB", "Database that stores the HTTP events")
+
+  Rel(event_producer, event_queue, "Notifies new event needs to be persisted")
+  Rel(event_queue, event_consumer, "Pulls new events")
+  Rel(event_consumer, timeseries_db, "Stores new events")
+
+  Container(clock, "Clock", "Java", "Listens to new Events and notifies the Reporters")
+  Container(alerts, "AlertManager", "Java", "Keeps track of the total traffic of the HTTP server and alerts when the defined threshold is crossed")
+  Container(statistics, "StatisticsManager", "Java", "Aggregates events information and reports statistics")
+
+  Rel(clock, alerts, "Sends a tick event when the internal clock has moved by one second")
+  Rel(clock, statistics, "Sends a tick event when the internal clock has moved by one second")
+}
+
+@enduml
