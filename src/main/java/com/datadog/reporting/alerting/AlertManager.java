@@ -2,24 +2,27 @@ package com.datadog.reporting.alerting;
 
 import com.datadog.domain.EventRepository;
 import com.datadog.reporting.BaseReporter;
+import com.datadog.reporting.report.Reporter;
+import java.util.concurrent.BlockingQueue;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.concurrent.BlockingQueue;
-
 @Slf4j
-public class AlertReporter extends BaseReporter {
+public class AlertManager extends BaseReporter {
   private static final int ALERT_WINDOW = 120;
   private static final int ALERT_THRESHOLD = 10;
 
+  private Reporter reporter;
   private EventRepository eventRepository;
   private int delay;
   private boolean active;
   @Setter private int threshold;
 
-  public AlertReporter(BlockingQueue<Long> queue, EventRepository eventRepository, int delay) {
+  public AlertManager(
+      BlockingQueue<Long> queue, Reporter reporter, EventRepository eventRepository, int delay) {
     super(queue);
 
+    this.reporter = reporter;
     this.eventRepository = eventRepository;
     this.delay = delay;
     this.active = false;
@@ -34,11 +37,14 @@ public class AlertReporter extends BaseReporter {
 
     if (this.active && averageRps < this.threshold) {
       this.active = false;
-      System.out.printf("High traffic alert mitigated at %d - hits = %f\n", timestamp, averageRps);
+      this.reporter.report(
+          String.format("High traffic alert mitigated at %d - hits = %f", timestamp, averageRps));
     } else if (!this.active && averageRps >= this.threshold) {
       this.active = true;
-      System.out.printf(
-          "High traffic generated an alert - hits = %f, triggered at %d.\n", averageRps, timestamp);
+      this.reporter.report(
+          String.format(
+              "High traffic generated an alert - hits = %f, triggered at %d",
+              averageRps, timestamp));
     }
   }
 }

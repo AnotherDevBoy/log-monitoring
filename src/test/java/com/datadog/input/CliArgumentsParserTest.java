@@ -1,4 +1,3 @@
 package com.datadog.input;
 
-public class CliArgumentsParserTest {
-}
+public class CliArgumentsParserTest {}

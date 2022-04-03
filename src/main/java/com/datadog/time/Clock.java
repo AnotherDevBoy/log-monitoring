@@ -2,7 +2,6 @@ package com.datadog.time;
 
 import com.datadog.domain.Event;
 import com.datadog.domain.EventListener;
-
 import java.util.concurrent.BlockingQueue;
 
 public class Clock implements EventListener {
@@ -23,9 +22,7 @@ public class Clock implements EventListener {
       if (timestamp > 0) {
         for (int i = 0; i < totalTicks; ++i) {
           for (var listener : tickerListeners) {
-            while (!listener.offer(timestamp + i)) {
-
-            }
+            while (!listener.offer(timestamp + i)) {}
           }
         }
       }

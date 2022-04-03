@@ -26,13 +26,14 @@ Java
 MUST:
 - [x] InfluxDB implementation
 - [x] Queue to send events
-- [ ] Move reporting to separate class
-- [ ] Alert threshold should be configurable
+- [x] Move reporting to separate class
+- [x] Alert threshold should be configurable
 - [ ] Status Code statistics
 - [ ] Instructions on how to run it
 - [ ] Explain design
 - [ ] Explain how to improve design
 - [ ] Unit tests
+- [ ] Review all requirements are met
 
 Optional:
 - [ ] More statistics

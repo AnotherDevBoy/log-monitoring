@@ -5,11 +5,10 @@ import com.datadog.domain.EventListener;
 import com.google.inject.Inject;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
-import lombok.RequiredArgsConstructor;
-
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class LogFileProcessor {
@@ -41,14 +40,14 @@ public class LogFileProcessor {
     }
 
     return new Event(
-            row[0],
-            row[1],
-            row[2],
-            Long.parseLong(row[3]),
-            tokens[0],
-            tokens[1],
-            tokens[2],
-            Integer.parseInt(row[5]),
-            Long.parseLong(row[6]));
+        row[0],
+        row[1],
+        row[2],
+        Long.parseLong(row[3]),
+        tokens[0],
+        tokens[1],
+        tokens[2],
+        Integer.parseInt(row[5]),
+        Long.parseLong(row[6]));
   }
 }

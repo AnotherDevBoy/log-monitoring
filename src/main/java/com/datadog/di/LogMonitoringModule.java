@@ -1,26 +1,29 @@
 package com.datadog.di;
 
-import com.datadog.reporting.alerting.AlertReporter;
 import com.datadog.domain.Event;
 import com.datadog.domain.EventListener;
 import com.datadog.domain.EventRepository;
 import com.datadog.domain.InfluxDbEventRepository;
 import com.datadog.ingestion.EventConsumer;
 import com.datadog.ingestion.EventProducer;
-import com.datadog.reporting.statistics.StatisticsReporter;
+import com.datadog.reporting.alerting.AlertManager;
+import com.datadog.reporting.report.ConsoleReporter;
+import com.datadog.reporting.report.Reporter;
+import com.datadog.reporting.statistics.StatisticsManager;
 import com.datadog.time.Clock;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import lombok.extern.slf4j.Slf4j;
 import org.influxdb.dto.Query;
 import org.testcontainers.containers.InfluxDBContainer;
 import org.testcontainers.utility.DockerImageName;
 
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
+@Slf4j
 public class LogMonitoringModule extends AbstractModule {
 
   @Singleton
@@ -30,7 +33,7 @@ public class LogMonitoringModule extends AbstractModule {
     var container = new InfluxDBContainer<>(DockerImageName.parse("influxdb").withTag("1.8.10"));
     container.setEnv(List.of("INFLUXDB_RETENTION_ENABLED=false"));
 
-    System.out.println("Starting InfluxDB");
+    log.info("Starting InfluxDB");
     container.start();
 
     var influxDB =
@@ -50,11 +53,17 @@ public class LogMonitoringModule extends AbstractModule {
                   container.stop();
                 }));
 
-    System.out.println("Creating database");
+    log.info("Creating database");
     influxDB.query(
         new Query(String.format("CREATE DATABASE %s", InfluxDbEventRepository.DATABASE_NAME)));
 
     return repository;
+  }
+
+  @Singleton
+  @Provides
+  public Reporter reporterProvider() {
+    return new ConsoleReporter();
   }
 
   @Singleton
@@ -66,10 +75,12 @@ public class LogMonitoringModule extends AbstractModule {
 
   @Singleton
   @Provides
-  public StatisticsReporter statisticsReporterProvider(@Named("stats_queue") BlockingQueue<Long> statisticsQueue, EventRepository repository) {
-    return new StatisticsReporter(statisticsQueue, repository, 2);
+  public StatisticsManager statisticsReporterProvider(
+      @Named("stats_queue") BlockingQueue<Long> statisticsQueue,
+      Reporter reporter,
+      EventRepository repository) {
+    return new StatisticsManager(statisticsQueue, reporter, repository, 2);
   }
-
 
   @Singleton
   @Provides
@@ -80,13 +91,18 @@ public class LogMonitoringModule extends AbstractModule {
 
   @Singleton
   @Provides
-  public AlertReporter alertReporterProvider(@Named("alert_queue") BlockingQueue<Long> alertQueue, EventRepository repository) {
-    return new AlertReporter(alertQueue, repository, 2);
+  public AlertManager alertReporterProvider(
+      @Named("alert_queue") BlockingQueue<Long> alertQueue,
+      Reporter reporter,
+      EventRepository repository) {
+    return new AlertManager(alertQueue, reporter, repository, 2);
   }
 
   @Singleton
   @Provides
-  public Clock clockProvider(@Named("stats_queue") BlockingQueue<Long> statisticsQueue, @Named("alert_queue") BlockingQueue<Long> alertQueue) {
+  public Clock clockProvider(
+      @Named("stats_queue") BlockingQueue<Long> statisticsQueue,
+      @Named("alert_queue") BlockingQueue<Long> alertQueue) {
     return new Clock(statisticsQueue, alertQueue);
   }
 
@@ -99,13 +115,15 @@ public class LogMonitoringModule extends AbstractModule {
 
   @Singleton
   @Provides
-  public EventConsumer eventConsumerProvider(@Named("event_queue") BlockingQueue<Event> eventQueue, EventRepository eventRepository) {
+  public EventConsumer eventConsumerProvider(
+      @Named("event_queue") BlockingQueue<Event> eventQueue, EventRepository eventRepository) {
     return new EventConsumer(eventQueue, eventRepository);
   }
 
   @Singleton
   @Provides
-  public EventProducer eventProducerProvider(@Named("event_queue") BlockingQueue<Event> eventQueue) {
+  public EventProducer eventProducerProvider(
+      @Named("event_queue") BlockingQueue<Event> eventQueue) {
     return new EventProducer(eventQueue);
   }
 

@@ -1,9 +1,8 @@
 package com.datadog.input;
 
+import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import java.util.Optional;
 
 @Getter
 @RequiredArgsConstructor

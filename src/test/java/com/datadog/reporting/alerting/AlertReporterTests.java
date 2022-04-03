@@ -1,4 +1,3 @@
 package com.datadog.reporting.alerting;
 
-public class AlertReporterTests {
-}
+public class AlertReporterTests {}

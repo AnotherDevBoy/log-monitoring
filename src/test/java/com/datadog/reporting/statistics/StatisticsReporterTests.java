@@ -1,4 +1,3 @@
 package com.datadog.reporting.statistics;
 
-public class StatisticsReporterTests {
-}
+public class StatisticsReporterTests {}

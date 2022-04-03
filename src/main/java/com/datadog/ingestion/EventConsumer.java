@@ -2,11 +2,10 @@ package com.datadog.ingestion;
 
 import com.datadog.domain.Event;
 import com.datadog.domain.EventRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
 @RequiredArgsConstructor
 public class EventConsumer implements Runnable {

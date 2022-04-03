@@ -1,4 +1,3 @@
 package com.datadog.time;
 
-public class ClockTests {
-}
+public class ClockTests {}

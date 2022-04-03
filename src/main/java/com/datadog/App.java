@@ -4,12 +4,14 @@ import com.datadog.di.LogMonitoringModule;
 import com.datadog.ingestion.EventConsumer;
 import com.datadog.input.CliArgumentsParser;
 import com.datadog.input.LogFileProcessor;
-import com.datadog.reporting.alerting.AlertReporter;
-import com.datadog.reporting.statistics.StatisticsReporter;
+import com.datadog.reporting.alerting.AlertManager;
+import com.datadog.reporting.statistics.StatisticsManager;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class App {
   public static void main(String[] args) {
     var maybeArguments = CliArgumentsParser.parseArguments(args);
@@ -24,7 +26,7 @@ public class App {
       var arguments = maybeArguments.get();
 
       if (arguments.getMaybeAlertThreshold().isPresent()) {
-        var alertReporter = injector.getInstance(AlertReporter.class);
+        var alertReporter = injector.getInstance(AlertManager.class);
         alertReporter.setThreshold(arguments.getMaybeAlertThreshold().get());
       }
 
@@ -42,12 +44,27 @@ public class App {
   }
 
   private static void startBackgroundThreads(Injector injector) {
-    var statisticsReporter = injector.getInstance(StatisticsReporter.class);
-    var alertReporter = injector.getInstance(AlertReporter.class);
+    var statisticsReporter = injector.getInstance(StatisticsManager.class);
+    var alertReporter = injector.getInstance(AlertManager.class);
     var eventConsumer = injector.getInstance(EventConsumer.class);
 
-    new ThreadFactoryBuilder().setNameFormat("statistics").setDaemon(true).build().newThread(statisticsReporter).start();
-    new ThreadFactoryBuilder().setNameFormat("alerts").setDaemon(true).build().newThread(alertReporter).start();
-    new ThreadFactoryBuilder().setNameFormat("event-consumer").setDaemon(true).build().newThread(eventConsumer).start();
+    new ThreadFactoryBuilder()
+        .setNameFormat("statistics")
+        .setDaemon(true)
+        .build()
+        .newThread(statisticsReporter)
+        .start();
+    new ThreadFactoryBuilder()
+        .setNameFormat("alerts")
+        .setDaemon(true)
+        .build()
+        .newThread(alertReporter)
+        .start();
+    new ThreadFactoryBuilder()
+        .setNameFormat("event-consumer")
+        .setDaemon(true)
+        .build()
+        .newThread(eventConsumer)
+        .start();
   }
 }
