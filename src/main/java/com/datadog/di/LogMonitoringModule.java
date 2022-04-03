@@ -1,16 +1,18 @@
 package com.datadog.di;
 
-import com.datadog.alerting.AlertReporter;
-import com.datadog.clock.Clock;
+import com.datadog.reporting.alerting.AlertReporter;
 import com.datadog.domain.Event;
+import com.datadog.domain.EventListener;
 import com.datadog.domain.EventRepository;
 import com.datadog.domain.InfluxDbEventRepository;
 import com.datadog.ingestion.EventConsumer;
 import com.datadog.ingestion.EventProducer;
-import com.datadog.statistics.StatisticsReporter;
+import com.datadog.reporting.statistics.StatisticsReporter;
+import com.datadog.time.Clock;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import org.influxdb.dto.Query;
 import org.testcontainers.containers.InfluxDBContainer;
 import org.testcontainers.utility.DockerImageName;
@@ -57,31 +59,59 @@ public class LogMonitoringModule extends AbstractModule {
 
   @Singleton
   @Provides
-  public StatisticsReporter statisticsReporterProvider(EventRepository repository) {
-    return new StatisticsReporter(repository, 2);
+  @Named("stats_queue")
+  public BlockingQueue<Long> statisticsQueueProvider() {
+    return new LinkedBlockingQueue<>(1);
   }
 
   @Singleton
   @Provides
-  public AlertReporter alertReporterProvider(EventRepository repository) {
-    return new AlertReporter(repository, 2);
+  public StatisticsReporter statisticsReporterProvider(@Named("stats_queue") BlockingQueue<Long> statisticsQueue, EventRepository repository) {
+    return new StatisticsReporter(statisticsQueue, repository, 2);
+  }
+
+
+  @Singleton
+  @Provides
+  @Named("alert_queue")
+  public BlockingQueue<Long> alertQueueProvider() {
+    return new LinkedBlockingQueue<>(1);
   }
 
   @Singleton
   @Provides
-  public Clock clockProvider(StatisticsReporter statisticsReporter, AlertReporter alertReporter) {
-    return new Clock(statisticsReporter, alertReporter);
+  public AlertReporter alertReporterProvider(@Named("alert_queue") BlockingQueue<Long> alertQueue, EventRepository repository) {
+    return new AlertReporter(alertQueue, repository, 2);
   }
 
   @Singleton
   @Provides
-  public EventProducer eventProducerProvider(EventRepository eventRepository) {
-    BlockingQueue<Event> queue = new LinkedBlockingQueue<>(1);
-    var consumer =  new EventConsumer(queue, eventRepository);
+  public Clock clockProvider(@Named("stats_queue") BlockingQueue<Long> statisticsQueue, @Named("alert_queue") BlockingQueue<Long> alertQueue) {
+    return new Clock(statisticsQueue, alertQueue);
+  }
 
-    var thread = new Thread(consumer);
-    thread.start();
+  @Singleton
+  @Provides
+  @Named("event_queue")
+  public BlockingQueue<Event> eventQueueProvider() {
+    return new LinkedBlockingQueue<>(1);
+  }
 
-    return new EventProducer(queue);
+  @Singleton
+  @Provides
+  public EventConsumer eventConsumerProvider(@Named("event_queue") BlockingQueue<Event> eventQueue, EventRepository eventRepository) {
+    return new EventConsumer(eventQueue, eventRepository);
+  }
+
+  @Singleton
+  @Provides
+  public EventProducer eventProducerProvider(@Named("event_queue") BlockingQueue<Event> eventQueue) {
+    return new EventProducer(eventQueue);
+  }
+
+  @Singleton
+  @Provides
+  public List<EventListener> eventListenersProvider(EventProducer eventProducer, Clock clock) {
+    return List.of(eventProducer, clock);
   }
 }

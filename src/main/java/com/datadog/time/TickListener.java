@@ -1,4 +1,4 @@
-package com.datadog.clock;
+package com.datadog.time;
 
 public interface TickListener {
   void tick(long timestamp);

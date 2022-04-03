@@ -1,4 +1,4 @@
-package com.datadog.cli;
+package com.datadog.input;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -35,7 +35,7 @@ public class CliArgumentsParser {
 
       String alertThresholdValue = cmd.getOptionValue("alert_threshold");
 
-      return Optional.of(new CliArguments(cmd.getOptionValue("log"), alertThresholdValue != null ? Integer.parseInt(alertThresholdValue) : 10));
+      return Optional.of(new CliArguments(cmd.getOptionValue("log"), alertThresholdValue != null ? Optional.of(Integer.parseInt(alertThresholdValue)) : Optional.empty()));
     } catch (Exception e) {
       HelpFormatter formatter = new HelpFormatter();
       formatter.printHelp("LogMonitor", options);

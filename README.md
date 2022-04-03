@@ -20,14 +20,17 @@ Java
 ## Follow ups
 - SQS
 - [ ] InfluxDB batch writing
+- Alert resilience
 
 ## TODO
 MUST:
 - [x] InfluxDB implementation
 - [x] Queue to send events
+- [ ] Move reporting to separate class
 - [ ] Alert threshold should be configurable
 - [ ] Status Code statistics
 - [ ] Instructions on how to run it
+- [ ] Explain design
 - [ ] Explain how to improve design
 - [ ] Unit tests
 

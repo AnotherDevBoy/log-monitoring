@@ -1,19 +1,23 @@
-package com.datadog.statistics;
+package com.datadog.reporting.statistics;
 
-import com.datadog.clock.TickListener;
 import com.datadog.domain.EventRepository;
-import java.util.Map;
+import com.datadog.reporting.BaseReporter;
 
-public class StatisticsReporter implements TickListener {
+import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+
+public class StatisticsReporter extends BaseReporter {
   private static final int STATS_WINDOW = 10;
+
   private final EventRepository eventRepository;
   private final int delay;
   private int counter;
 
-  public StatisticsReporter(EventRepository eventRepository, int delay) {
+  public StatisticsReporter(BlockingQueue<Long> queue, EventRepository eventRepository, int delay) {
+    super(queue);
+
     this.eventRepository = eventRepository;
     this.delay = delay;
-
     this.counter = -delay;
   }
 

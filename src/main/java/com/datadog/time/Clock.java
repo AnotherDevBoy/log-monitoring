@@ -1,15 +1,17 @@
-package com.datadog.clock;
+package com.datadog.time;
 
 import com.datadog.domain.Event;
 import com.datadog.domain.EventListener;
 
+import java.util.concurrent.BlockingQueue;
+
 public class Clock implements EventListener {
-  private final TickListener[] listeners;
+  private final BlockingQueue<Long>[] tickerListeners;
 
   private long timestamp;
 
-  public Clock(TickListener... listeners) {
-    this.listeners = listeners;
+  public Clock(BlockingQueue<Long>... tickerListeners) {
+    this.tickerListeners = tickerListeners;
     timestamp = 0;
   }
 
@@ -20,8 +22,10 @@ public class Clock implements EventListener {
 
       if (timestamp > 0) {
         for (int i = 0; i < totalTicks; ++i) {
-          for (var listener : listeners) {
-            listener.tick(timestamp + i);
+          for (var listener : tickerListeners) {
+            while (!listener.offer(timestamp + i)) {
+
+            }
           }
         }
       }

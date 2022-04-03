@@ -1,20 +1,14 @@
 package com.datadog;
 
-import com.datadog.cli.CliArguments;
-import com.datadog.cli.CliArgumentsParser;
-import com.datadog.clock.Clock;
 import com.datadog.di.LogMonitoringModule;
-import com.datadog.domain.EventListener;
-import com.datadog.domain.EventParser;
-import com.datadog.ingestion.EventProducer;
+import com.datadog.ingestion.EventConsumer;
+import com.datadog.input.CliArgumentsParser;
+import com.datadog.input.LogFileProcessor;
+import com.datadog.reporting.alerting.AlertReporter;
+import com.datadog.reporting.statistics.StatisticsReporter;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
-
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.List;
 
 public class App {
   public static void main(String[] args) {
@@ -27,10 +21,18 @@ public class App {
     try {
       Injector injector = Guice.createInjector(new LogMonitoringModule());
 
-      var eventProducer = injector.getInstance(EventProducer.class);
-      var clock = injector.getInstance(Clock.class);
+      var arguments = maybeArguments.get();
 
-      processFile(maybeArguments.get(), List.of(eventProducer, clock));
+      if (arguments.getMaybeAlertThreshold().isPresent()) {
+        var alertReporter = injector.getInstance(AlertReporter.class);
+        alertReporter.setThreshold(arguments.getMaybeAlertThreshold().get());
+      }
+
+      var logFileProcessor = injector.getInstance(LogFileProcessor.class);
+
+      startBackgroundThreads(injector);
+
+      logFileProcessor.processFile(arguments);
     } catch (Exception e) {
       System.err.println("An unrecoverable error occurred");
       e.printStackTrace();
@@ -39,18 +41,13 @@ public class App {
     }
   }
 
-  private static void processFile(CliArguments cliArguments, List<EventListener> eventListeners) throws FileNotFoundException {
-    FileReader filereader = new FileReader(cliArguments.getFilePath());
+  private static void startBackgroundThreads(Injector injector) {
+    var statisticsReporter = injector.getInstance(StatisticsReporter.class);
+    var alertReporter = injector.getInstance(AlertReporter.class);
+    var eventConsumer = injector.getInstance(EventConsumer.class);
 
-    CSVReader csvReader = new CSVReaderBuilder(filereader).withSkipLines(1).build();
-
-    System.out.println("Start sending events");
-    for (String[] row : csvReader) {
-      var event = EventParser.parseEvent(row);
-
-      for (var listener : eventListeners) {
-        listener.notify(event);
-      }
-    }
+    new ThreadFactoryBuilder().setNameFormat("statistics").setDaemon(true).build().newThread(statisticsReporter).start();
+    new ThreadFactoryBuilder().setNameFormat("alerts").setDaemon(true).build().newThread(alertReporter).start();
+    new ThreadFactoryBuilder().setNameFormat("event-consumer").setDaemon(true).build().newThread(eventConsumer).start();
   }
 }
