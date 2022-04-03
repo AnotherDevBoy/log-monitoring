@@ -1,5 +1,5 @@
 # Log Monitoring future ideas
-On this document, I have capture some high level ideas on how this application could be extended to support real-life traffic.
+In this document, I have captured some high level ideas on how this application could be extended to support real-life traffic.
 
 Going in more detail is outside of the scope of this exercise but I am happy to discuss that separately.
 

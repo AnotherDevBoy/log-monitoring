@@ -6,7 +6,7 @@
 * The application **tests** can be found under `/src/main/test`.
 * If you want to know more about **thought process** I followed to come up with a solution before I wrote any code, you can read [this](/discovery/README.md).
 * If you want to know more about the **design** of the log-monitoring application, you can read [this](/design/README.md).
-* If you want to hear some ideas on how improve this app even further, you can read [this](/future/README.md).
+* If you want to hear some ideas on how **improve this app** even further, you can read [this](/future/README.md).
 
 ## How to run the app?
 ### Setup steps
@@ -38,8 +38,11 @@ java -jar log-monitoring.jar --log <path to csv file> --alert_threshold <new_thr
 
 ## TODO
 ### MUST
-- [ ] Explain how to improve design
+- [ ] Statistics: the sections of the web site with the most hits. For example, the section for "/api/user" is
+"/api" and the section for "/report" is "/report"
 - [ ] Status code should start from 100 to be RFC compliant
 - [ ] Unit tests
-- [ ] Review all requirements are met
+- [ ] Write a test for the alerting logic
+- [ ] Grammar check
+- [ ] Package and send
 
