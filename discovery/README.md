@@ -103,10 +103,12 @@ For alerts, since the threshold is 2 minutes, we could consider bumping even hig
 
 ## Proposal
 
-The solution will be an event-driven application
+The solution will be an event-driven application that will process every line from the file as a separate event.
 
-### Option A - In-memory storage
-TBD
+These events will be persisted in a time-series database (`InfluxDB`) to simplify the data aggregation part of the problem.
 
-### Option B - InfluxDB storage
-TBD
+The application will have an internal clock built from the `timestamp` values that are read from the file.
+
+This internal clock will be used to ensure statistics and alerts are reported timely based on the order of the logs in the `csv` file according to their `timestamp` value.
+
+To accomodate for out of order events, the statistics and alerts calculation will be delayed by `2 seconds`.
