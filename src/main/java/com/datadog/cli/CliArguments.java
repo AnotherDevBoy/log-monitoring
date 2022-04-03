@@ -7,4 +7,5 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CliArguments {
   private final String filePath;
+  private final int alertThreshold;
 }
