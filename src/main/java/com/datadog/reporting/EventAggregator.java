@@ -1,11 +1,10 @@
 package com.datadog.reporting;
 
 import com.datadog.time.TickListener;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class EventAggregator implements Runnable, TickListener {

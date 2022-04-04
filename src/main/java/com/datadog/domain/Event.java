@@ -3,7 +3,9 @@ package com.datadog.domain;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.With;
 
+@With
 @Getter
 @ToString
 @RequiredArgsConstructor

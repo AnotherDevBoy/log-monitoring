@@ -3,10 +3,9 @@ package com.datadog.reporting.alerting;
 import com.datadog.domain.EventRepository;
 import com.datadog.reporting.EventAggregator;
 import com.datadog.reporting.report.Reporter;
+import java.util.concurrent.BlockingQueue;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.concurrent.BlockingQueue;
 
 @Slf4j
 public class AlertManager extends EventAggregator {

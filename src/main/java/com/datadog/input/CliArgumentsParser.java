@@ -1,5 +1,6 @@
 package com.datadog.input;
 
+import java.util.Optional;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -7,10 +8,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
-import java.util.Optional;
-
 public class CliArgumentsParser {
-  public static Optional<CliArguments> parseArguments(String[] args) {
+  public static Optional<CliArguments> parseArguments(String... args) {
     Options options = new Options();
 
     var logPathOption =
@@ -18,7 +17,7 @@ public class CliArgumentsParser {
             .hasArgs()
             .longOpt("log")
             .desc("The path to the log file")
-            .required(false)
+            .required(true)
             .build();
     var alertThresholdOption =
         Option.builder()

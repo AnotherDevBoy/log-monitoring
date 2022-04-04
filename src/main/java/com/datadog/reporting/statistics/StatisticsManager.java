@@ -49,7 +49,9 @@ public class StatisticsManager extends EventAggregator {
 
       if (maybeSection.isPresent()) {
         var section = maybeSection.get();
-        this.reporter.report(String.format("Section %s received the most hits with a total of %d. Interval: [%d, %d]",
+        this.reporter.report(
+            String.format(
+                "Section %s received the most hits with a total of %d. Interval: [%d, %d]",
                 section.getKey(), section.getValue(), start, end));
       }
 

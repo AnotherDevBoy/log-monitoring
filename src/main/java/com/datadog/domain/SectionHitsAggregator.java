@@ -21,9 +21,8 @@ public class SectionHitsAggregator {
   }
 
   public Optional<Map.Entry<String, Integer>> getSectionWithMostHits() {
-    var maxEntry = this.hitsPerSection.entrySet()
-            .stream()
-            .max(Comparator.comparing(Map.Entry::getValue));
+    var maxEntry =
+        this.hitsPerSection.entrySet().stream().max(Comparator.comparing(Map.Entry::getValue));
     return maxEntry;
   }
 }

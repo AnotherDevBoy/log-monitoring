@@ -1,9 +1,8 @@
 package com.datadog.domain;
 
-import lombok.Getter;
-
 import java.util.HashMap;
 import java.util.Map;
+import lombok.Getter;
 
 public class StatusCodeAggregator {
   @Getter private final Map<Integer, Integer> statusCodes;

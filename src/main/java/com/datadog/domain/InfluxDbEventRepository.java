@@ -1,16 +1,15 @@
 package com.datadog.domain;
 
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
-
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -94,15 +93,15 @@ public class InfluxDbEventRepository implements EventRepository {
 
     try {
       Query query =
-              new Query(
-                      String.format(
-                              "SELECT * from \"%s\" where time >= %ds and time < %ds GROUP BY \"path\"",
-                              METRIC_NAME, start, end));
+          new Query(
+              String.format(
+                  "SELECT * from \"%s\" where time >= %ds and time < %ds GROUP BY \"path\"",
+                  METRIC_NAME, start, end));
       var queryResult = influxDB.query(query);
 
       for (var s : queryResult.getResults().get(0).getSeries()) {
         sectionHitsAggregator.addHitToSection(
-                Event.getSection(s.getTags().get("path")), s.getValues().size());
+            Event.getSection(s.getTags().get("path")), s.getValues().size());
       }
     } catch (Exception e) {
       log.warn("Unexpected response from InfluxDB", e);

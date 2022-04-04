@@ -19,11 +19,9 @@ public class Clock implements EventListener {
     if (event.getTimestamp() > timestamp) {
       long totalTicks = event.getTimestamp() - timestamp;
 
-      if (timestamp > 0) {
-        for (int i = 0; i < totalTicks; ++i) {
-          for (var listener : tickerListeners) {
-            while (!listener.offer(timestamp + i)) {}
-          }
+      for (int i = 1; i < totalTicks + 1; ++i) {
+        for (var listener : tickerListeners) {
+          while (!listener.offer(timestamp + i)) {}
         }
       }
 

@@ -38,7 +38,6 @@ java -jar log-monitoring.jar --log <path to csv file> --alert_threshold <new_thr
 
 ## TODO
 ### MUST
-- [ ] Write a test for the alerting logic
 - [ ] Unit tests
 - [ ] Design: Explain the use of Testcontainers
 - [ ] Future: alert conditions, sensitivity
