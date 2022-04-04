@@ -1,15 +1,17 @@
 package com.datadog.domain;
 
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
+import org.influxdb.InfluxDB;
+import org.influxdb.dto.Point;
+import org.influxdb.dto.Query;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.influxdb.InfluxDB;
-import org.influxdb.dto.Point;
-import org.influxdb.dto.Query;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -88,7 +90,7 @@ public class InfluxDbEventRepository implements EventRepository {
   }
 
   @Override
-  public Optional<Map.Entry<String, Integer>> getSectionWithMostHits(long start, long end) {
+  public Optional<Pair<String, Integer>> getSectionWithMostHits(long start, long end) {
     SectionHitsAggregator sectionHitsAggregator = new SectionHitsAggregator();
 
     try {
@@ -107,6 +109,12 @@ public class InfluxDbEventRepository implements EventRepository {
       log.warn("Unexpected response from InfluxDB", e);
     }
 
-    return sectionHitsAggregator.getSectionWithMostHits();
+    var entry = sectionHitsAggregator.getSectionWithMostHits();
+
+    if (entry.isEmpty()) {
+      return Optional.empty();
+    }
+
+    return Optional.of(Pair.of(entry.get().getKey(), entry.get().getValue()));
   }
 }

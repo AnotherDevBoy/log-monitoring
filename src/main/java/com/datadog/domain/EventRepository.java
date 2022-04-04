@@ -1,5 +1,7 @@
 package com.datadog.domain;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.util.Map;
 import java.util.Optional;
 
@@ -10,5 +12,5 @@ public interface EventRepository {
 
   Map<Integer, Integer> getStatusCodesCount(long start, long end);
 
-  Optional<Map.Entry<String, Integer>> getSectionWithMostHits(long start, long end);
+  Optional<Pair<String, Integer>> getSectionWithMostHits(long start, long end);
 }

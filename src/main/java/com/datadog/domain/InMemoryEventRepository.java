@@ -1,5 +1,7 @@
 package com.datadog.domain;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,7 +50,7 @@ public class InMemoryEventRepository implements EventRepository {
   }
 
   @Override
-  public Optional<Map.Entry<String, Integer>> getSectionWithMostHits(long start, long end) {
+  public Optional<Pair<String, Integer>> getSectionWithMostHits(long start, long end) {
     var eventsByTimestamp = this.getEventsInRange(start, end);
 
     var sectionHitsAggregator = new SectionHitsAggregator();
@@ -59,7 +61,13 @@ public class InMemoryEventRepository implements EventRepository {
       }
     }
 
-    return sectionHitsAggregator.getSectionWithMostHits();
+    var entry = sectionHitsAggregator.getSectionWithMostHits();
+
+    if (entry.isEmpty()) {
+      return Optional.empty();
+    }
+
+    return Optional.of(Pair.of(entry.get().getKey(), entry.get().getValue()));
   }
 
   private Map<Long, List<Event>> getEventsInRange(long start, long end) {
