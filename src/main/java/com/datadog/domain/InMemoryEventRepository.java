@@ -1,12 +1,11 @@
 package com.datadog.domain;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class InMemoryEventRepository implements EventRepository {
   private final Map<Long, List<Event>> events;

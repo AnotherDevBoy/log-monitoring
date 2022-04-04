@@ -1,5 +1,6 @@
 package com.datadog.domain;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -9,6 +10,7 @@ import lombok.With;
 @Getter
 @ToString
 @RequiredArgsConstructor
+@EqualsAndHashCode
 public class Event {
   private final String remoteHost;
   private final String rfc931;

@@ -1,18 +1,5 @@
 package com.datadog.reporting.statistics;
 
-import com.datadog.domain.EventRepository;
-import com.datadog.reporting.report.Reporter;
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -20,10 +7,21 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.datadog.domain.EventRepository;
+import com.datadog.reporting.report.Reporter;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.LinkedBlockingQueue;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 public class StatisticsReporterTests {
 
-  @Mock
-  private Reporter mockReporter;
+  @Mock private Reporter mockReporter;
   @Mock private EventRepository mockEventRepository;
   private StatisticsManager sut;
 
@@ -31,8 +29,8 @@ public class StatisticsReporterTests {
   public void beforeEach() {
     MockitoAnnotations.initMocks(this);
     this.sut =
-            new StatisticsManager(
-                    new LinkedBlockingQueue<>(), this.mockReporter, this.mockEventRepository, 0);
+        new StatisticsManager(
+            new LinkedBlockingQueue<>(), this.mockReporter, this.mockEventRepository, 0);
   }
 
   @Test
@@ -60,8 +58,8 @@ public class StatisticsReporterTests {
     int delay = 2;
 
     this.sut =
-            new StatisticsManager(
-                    new LinkedBlockingQueue<>(), this.mockReporter, this.mockEventRepository, delay);
+        new StatisticsManager(
+            new LinkedBlockingQueue<>(), this.mockReporter, this.mockEventRepository, delay);
 
     whenAllStatisticsAvailable();
 
@@ -73,7 +71,8 @@ public class StatisticsReporterTests {
   }
 
   @Test
-  public void tick_whenReceivedAsManyTicksAsTheStatsWindow_AndSectionIsEmpty_reportStatisticsAndSkipsSectionStatistics() {
+  public void
+      tick_whenReceivedAsManyTicksAsTheStatsWindow_AndSectionIsEmpty_reportStatisticsAndSkipsSectionStatistics() {
     whenAllStatisticsButSectionAvailable();
 
     for (long l = 0; l <= 10; l++) {
@@ -85,7 +84,8 @@ public class StatisticsReporterTests {
 
   private void whenAllStatisticsAvailable() {
     whenAllStatisticsButSectionAvailable();
-    when(this.mockEventRepository.getSectionWithMostHits(anyLong(), anyLong())).thenReturn(Optional.of(Pair.of("api", 1)));
+    when(this.mockEventRepository.getSectionWithMostHits(anyLong(), anyLong()))
+        .thenReturn(Optional.of(Pair.of("api", 1)));
   }
 
   private void whenAllStatisticsButSectionAvailable() {
@@ -103,7 +103,8 @@ public class StatisticsReporterTests {
 
     assertTrue(argumentCaptor.getAllValues().get(0).contains("Average RPS"));
     assertTrue(argumentCaptor.getAllValues().get(0).contains("Status codes: 1xx="));
-    assertTrue(argumentCaptor.getAllValues().get(1).contains("received the most hits with a total of"));
+    assertTrue(
+        argumentCaptor.getAllValues().get(1).contains("received the most hits with a total of"));
   }
 
   private void assertAverageAndStatusStatisticsReported() {
