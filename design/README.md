@@ -16,7 +16,7 @@ The `LogFileProcessor` reads the file line by line and notifies the event listen
 The two event listeners are the internal `Clock` and the `EventProducer`.
 
 ## Internal clock
-Based on the `timestamp` of every event read, the `Clock` class will estimate the application internal time. 
+Based on the `timestamp` of every event read, the `Clock` class will estimate the application's internal time. 
 
 To do so, every time a new value that's higher than the current time stored, it will increase the time of the clock and notify any components that rely on the internal time.
 
@@ -33,9 +33,11 @@ To optimize query performance for statistics and alerts, structure of the events
 * **tags**: `path`, `status_code`, `http_method`, `id`.
 * **fields**: everything else.
 
-Since InfluxDB will consider as duplicate (and ovewrite) any events that have the exact same tags, an `id` field was introduced to force InfluxDB to treat every event as a separate entry.
+Since InfluxDB will consider as duplicate (and overwrite) any events that have the exact same tags, an `id` field was introduced to force InfluxDB to treat every event as a separate entry.
 
 This could have negative performance implications in a real-life application due to the cardinality that's introduced by the `id` field. A more performant approach could be achieved by ensuring a higher precision of the event `timestamp` (for example, in nanoseconds).
+
+> Note: I have used Testcontainers to simplify the infrastructure problem while keeping the exercise realistic. Thanks to Testcontainers, we can run the application against a real InfluxDB container without installing anything locally other than having Docker.
 
 # Statistics and Alerting
 Every 10 internal seconds, the `StatisticsManager` will query the `InfluxDB` database to produce:

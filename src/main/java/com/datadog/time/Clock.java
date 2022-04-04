@@ -16,6 +16,10 @@ public class Clock implements EventListener {
 
   @Override
   public void notify(Event event) {
+    if (this.timestamp == 0) {
+      this.timestamp = event.getTimestamp() - 1;
+    }
+
     if (event.getTimestamp() > timestamp) {
       long totalTicks = event.getTimestamp() - timestamp;
 

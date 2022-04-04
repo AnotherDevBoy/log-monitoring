@@ -31,14 +31,24 @@ An usual pattern in the industry to balance storage and performance is to introd
 * Events that have been produced within a defined range (for example, 30 days) would be stored in the "hot storage" for quick access. InfluxDB is still a good fit for that.
 * For events that were produced before that range, if there is still interest on persisting the data and assuming that it will be consulted less frequently, other storage solutions (commonly known as data lakes) would be a better fit.
 
-# Statistics and alerting
+## Statistics and alerting
+### Statistics
 Reporting statistics through console is not the most user-friendly solution. A better alternative would be to produce the same information in a more visual way through real-time charts on a web dashboard.
 
-For alerting, the persistence model would need to be extended to be able to support multiple alerts with different alert conditions running at the same time.
+### Alerting
+From a usability point of view, the alert system could be extended to support:
+- Conditions such as lesser than or equals to.
+- Metrics such as percentiles RPS or average RPS on a specific path.
+- The ability to react differently based on the threshold (alert severity).
+- Noise reduction by adding the number of times the threshold has to be crossed within multiple evaluation windows.
 
-Additionally, for resilience purposes, the alert management system would need to be resileint to application crashes or reboots. One way to do that would be through the persistence of snapshots of its alert evaluation cycle to ensure it can continue where it left off and eventually catch up after a potential short delay.
+Checking the alerts every second might not be a scalable solution in the long run. A more scalable approach can be achieved by introducing evaluation windows that ensure that the alert is evaluated at least once every X seconds.
 
-# Deployment model
+The persistence model would need to be extended to be able to support multiple alerts running at the same time.
+
+Additionally, the alert management system would need to be resilient to application crashes or reboots. One way to do that would be through the persistence of snapshots of its alert evaluation cycle to ensure it can continue where it left off and eventually catch up after a potential short delay.
+
+## Deployment model
 The application was originally designed with a fair separation of responsibilities via threads.
 
 My idea would be to continue on that direction and deploy separately those components (for example, as containers within a cluster).

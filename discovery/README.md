@@ -20,10 +20,10 @@ There are a couple of requirements that will affect how this problem can be appr
 As mentioned, the solution won't be able to read the entire file in memory and should treat each line as events that are received over time. Additionally, the solution will have to use the timestamp included in the logs to emulate the system clock.
 
 ### Statistics reporting
-This area is fairly vague in the problem statement. Therefore, we will make a few assumptions around what the statistics should include based on personal experience and the information provided in the `csv` file (remotehost, rfc931, authuser, date, request, status, bytes).
+This area is fairly vague in the problem statement. Therefore, we will make a few assumptions about what the statistics should include based on personal experience and the information provided in the `csv` file (remotehost, rfc931, authuser, date, request, status, bytes).
 
 There are only a couple of requirements:
-> For every 10 seconds of log lines, display stats about the traffic during those 10s: the sections of the web site with the most hits, as well as statistics that might be useful for debugging.
+> For every 10 seconds of log lines, display stats about the traffic during those 10s: the sections of the website with the most hits, as well as statistics that might be useful for debugging.
 > Make a reasonable assumption about how to handle the 10-second intervals, there are a couple of valid options here. Make a similar assumption about how frequently stats should be displayed as you process (but don't just print them at the end!).
 
 As a bare minimum (MVP), this report should include: 
@@ -46,12 +46,12 @@ The **total traffic** wording is the key here. This will simplify our alerting l
 However, the problem statement is vague on how the **alert threshold** can be configured. Therefore, we have a few options based on time availability:
 * Hardcode the threshold in the code.
 * Include it as a command line parameter.
-* Define the alerting thresholds in a `JSON` file. This build on the idea of **alerting as code**, which is a pattern that facilitates the management of alerts since it enables the tracking alerts in source control and building deployment automation around it.
+* Define the alerting thresholds in a `JSON` file. This builds on the idea of **alerting as code**, which is a pattern that facilitates the management of alerts since it enables the tracking alerts in source control and building deployment automation around it.
 
 > Whenever the total traffic drops again below that value on average for the past 2 minutes, print another message detailing when the alert recovered, +/- a second.
 > The time in the alert message can be formatted however you like (using a timestamp or something more readable are both fine), but the time cited must be in terms of when the alert or recovery was triggered in the log file, not the current time.
 
-Again, here the problem statement is reenforcing the idea of emulating the system clock based on the logs as highlighted in the **Data ingestion** section.
+Again, here the problem statement is reenforcing the idea of emulating the system clock based on the logs, as highlighted in the **Data ingestion** section.
 
 > Duplicate alerts should not be triggered - a second alert should not be triggered before a recovery of the first.
 
@@ -59,7 +59,7 @@ This means that we will have to keep track of the alerts that are currently acti
 
 > The alerting state does not need to persist across program runs
 
-Finally, this means that every time the app runs it should produce the same or very similar results.
+Finally, this means that every time the app runs, it should produce the same or very similar results.
 
 ## Discovery
 ### HTTP access log
@@ -73,10 +73,10 @@ The first issue that was encountered was the fact that the events can be out of 
 "10.0.0.5","-","apache",1549573860,"POST /report HTTP/1.0",500,1307
 ```
 
-This has an implication in both, the **statistics and the alerting accuracy**, since there isn't a deterministic way to know when all the events for a particular second (UNIX timestamps) will be processed.
+This has an implication in both the **statistics and the alerting accuracy**, since there isn't a deterministic way to know when all the events for a particular second (UNIX timestamps) will be processed.
 
 There are a few paths we could take:
-* **Ignore out of order events**. This is the simplest solution but it has the potential of missing alerts that should be fired when the total traffic is very close to the threshold.
+* **Ignore out-of-order events**. This is the simplest solution, but it has the potential of missing alerts that should be fired when the total traffic is very close to the threshold.
 * **Delay the reporting of statistics/alerts by a *well defined* number of seconds**. This will reduce the risk of missing alerts that are close to the threshold at the cost of delaying the alert firing, which has an impact on the ability to respond to the alert quickly.
 
 In order to facilidate the decision, I have assumed that the `csv` file contains a fair representation of what the real-life events will be like for this application and wrote a few scripts to understand the impact of either of the options highlighted above.
@@ -111,4 +111,4 @@ The application will have an internal clock built from the `timestamp` values th
 
 This internal clock will be used to ensure statistics and alerts are reported timely based on the order of the logs in the `csv` file according to their `timestamp` value.
 
-To accomodate for out of order events, the statistics and alerts calculation will be delayed by `2 seconds`.
+To accommodate for out-of-order events, the statistics and alerts calculation will be delayed by `2 seconds`.
