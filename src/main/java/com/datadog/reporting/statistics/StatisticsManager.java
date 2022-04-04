@@ -1,12 +1,12 @@
 package com.datadog.reporting.statistics;
 
 import com.datadog.domain.EventRepository;
-import com.datadog.reporting.BaseReporter;
+import com.datadog.reporting.EventAggregator;
 import com.datadog.reporting.report.Reporter;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
-public class StatisticsManager extends BaseReporter {
+public class StatisticsManager extends EventAggregator {
   private static final int STATS_WINDOW = 10;
 
   private Reporter reporter;
@@ -32,16 +32,26 @@ public class StatisticsManager extends BaseReporter {
 
       double averageRps = this.eventRepository.getAverageRps(start, end);
       Map<Integer, Integer> statusCodes = this.eventRepository.getStatusCodesCount(start, end);
+
       this.reporter.report(
           String.format(
-              "Average RPS=%f. Status codes: 2xx=%d 3xx=%d 4xx=%d 5xx=%d. Interval: [%d, %d] ",
+              "Average RPS=%f. Status codes: 1xx=%d 2xx=%d 3xx=%d 4xx=%d 5xx=%d. Interval: [%d, %d]",
               averageRps,
+              statusCodes.get(100),
               statusCodes.get(200),
               statusCodes.get(300),
               statusCodes.get(400),
               statusCodes.get(500),
               start,
               end));
+
+      var maybeSection = this.eventRepository.getSectionWithMostHits(start, end);
+
+      if (maybeSection.isPresent()) {
+        var section = maybeSection.get();
+        this.reporter.report(String.format("Section %s received the most hits with a total of %d. Interval: [%d, %d]",
+                section.getKey(), section.getValue(), start, end));
+      }
 
       this.counter = 0;
     }

@@ -8,6 +8,7 @@ import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -85,5 +86,28 @@ public class InfluxDbEventRepository implements EventRepository {
     }
 
     return statusCodeAggregator.getStatusCodes();
+  }
+
+  @Override
+  public Optional<Map.Entry<String, Integer>> getSectionWithMostHits(long start, long end) {
+    SectionHitsAggregator sectionHitsAggregator = new SectionHitsAggregator();
+
+    try {
+      Query query =
+              new Query(
+                      String.format(
+                              "SELECT * from \"%s\" where time >= %ds and time < %ds GROUP BY \"path\"",
+                              METRIC_NAME, start, end));
+      var queryResult = influxDB.query(query);
+
+      for (var s : queryResult.getResults().get(0).getSeries()) {
+        sectionHitsAggregator.addHitToSection(
+                Event.getSection(s.getTags().get("path")), s.getValues().size());
+      }
+    } catch (Exception e) {
+      log.warn("Unexpected response from InfluxDB", e);
+    }
+
+    return sectionHitsAggregator.getSectionWithMostHits();
   }
 }

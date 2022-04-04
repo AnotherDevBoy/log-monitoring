@@ -1,16 +1,17 @@
 package com.datadog.reporting;
 
 import com.datadog.time.TickListener;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
+
 @Slf4j
-public abstract class BaseReporter implements Runnable, TickListener {
+public abstract class EventAggregator implements Runnable, TickListener {
   private final BlockingQueue<Long> queue;
 
-  protected BaseReporter(BlockingQueue<Long> queue) {
+  protected EventAggregator(BlockingQueue<Long> queue) {
     this.queue = queue;
   }
 
@@ -27,6 +28,7 @@ public abstract class BaseReporter implements Runnable, TickListener {
       } catch (InterruptedException interruptedException) {
         throw interruptedException;
       } catch (Exception e) {
+        // Swallowing other exceptions to save the thread from crashing
         log.warn("An error occurred while processing tick", e);
       }
     }

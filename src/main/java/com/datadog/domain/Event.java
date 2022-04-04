@@ -17,4 +17,8 @@ public class Event {
   private final String protocol;
   private final int statusCode;
   private final long bytes;
+
+  public static String getSection(String path) {
+    return "/" + path.split("/")[1];
+  }
 }

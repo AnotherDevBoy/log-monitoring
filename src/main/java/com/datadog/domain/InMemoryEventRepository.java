@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class InMemoryEventRepository implements EventRepository {
   private final Map<Long, List<Event>> events;
@@ -44,6 +45,21 @@ public class InMemoryEventRepository implements EventRepository {
                     e -> statusCodeAggregator.addStatusCode(e.getStatusCode(), 1)));
 
     return statusCodeAggregator.getStatusCodes();
+  }
+
+  @Override
+  public Optional<Map.Entry<String, Integer>> getSectionWithMostHits(long start, long end) {
+    var eventsByTimestamp = this.getEventsInRange(start, end);
+
+    var sectionHitsAggregator = new SectionHitsAggregator();
+
+    for (var events : eventsByTimestamp.values()) {
+      for (var event : events) {
+        sectionHitsAggregator.addHitToSection(Event.getSection(event.getPath()), 1);
+      }
+    }
+
+    return sectionHitsAggregator.getSectionWithMostHits();
   }
 
   private Map<Long, List<Event>> getEventsInRange(long start, long end) {

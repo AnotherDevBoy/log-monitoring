@@ -38,11 +38,10 @@ java -jar log-monitoring.jar --log <path to csv file> --alert_threshold <new_thr
 
 ## TODO
 ### MUST
-- [ ] Statistics: the sections of the web site with the most hits. For example, the section for "/api/user" is
-"/api" and the section for "/report" is "/report"
-- [ ] Status code should start from 100 to be RFC compliant
-- [ ] Unit tests
 - [ ] Write a test for the alerting logic
+- [ ] Unit tests
+- [ ] Design: Explain the use of Testcontainers
+- [ ] Future: alert conditions, sensitivity
 - [ ] Grammar check
 - [ ] Package and send
 
